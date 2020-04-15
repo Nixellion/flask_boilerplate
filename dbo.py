@@ -45,6 +45,7 @@ class BroModel(Model):
 class Entry(BroModel):
     filename = TextField()
 
+
     class Meta:
         database = db
 

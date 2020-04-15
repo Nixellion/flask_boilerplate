@@ -4,9 +4,10 @@ Could use flask-restful, I personally did not find much benefit in using it, yet
 '''
 
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from debug import catch_errors_json
 
+from dbo import Entry
 
 app = Blueprint("api", __name__)
 
@@ -15,6 +16,14 @@ app = Blueprint("api", __name__)
 def api_index():
     return jsonify({"data": 123})
 
+@app.route("/api/new_entry", methods=["GET", "POST"])
+@catch_errors_json
+def api_new_entry():
+    if request.method == "POST":
+        new_entry = Entry()
+        new_entry.filename = request.form['filename']
+        new_entry.save()
+    return jsonify({"success": True})
 
 # @app.route("/update")
 # @catch_errors_json

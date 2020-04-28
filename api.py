@@ -23,7 +23,7 @@ def api_new_entry():
         new_entry = Entry()
         new_entry.filename = request.form['filename']
         new_entry.save()
-    return jsonify({"success": True})
+        return jsonify({"success": True})
 
 # @app.route("/update")
 # @catch_errors_json

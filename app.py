@@ -17,7 +17,7 @@ setup_logging()
 # endregion
 
 from configuration import read_config
-import bro_jinja
+import jinja_filters
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'BLAAAA_GeneerateMeDynamicallyForBetterSecurity'
@@ -25,8 +25,9 @@ app.config['SECRET_KEY'] = 'BLAAAA_GeneerateMeDynamicallyForBetterSecurity'
 socketio = SocketIO(app, async_mode='eventlet')
 
 
-app.jinja_env.filters['html_line_breaks'] = bro_jinja.html_line_breaks
-#
+app.jinja_env.filters['html_line_breaks'] = jinja_filters.html_line_breaks
+
+
 # @app.context_processor
 # def inject_global_variables():
 #     return dict(

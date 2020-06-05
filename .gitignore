@@ -126,3 +126,6 @@ dmypy.json
 
 .idea/
 *.log
+data/database.db
+data/database.db-shm
+data/database.db-wal

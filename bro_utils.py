@@ -4,10 +4,14 @@ import os
 
 from random import getrandbits
 
-from flask import Request
+from flask import Request, render_template
 
 from paths import APP_DIR
+from configuration import read_config
+config = read_config()
 
+def render_template_themed(name, **kwargs):
+    return render_template(os.path.join(config['template'], name).replace("\\", "/"), **kwargs)
 
 def get_real_ip(request):
     try:

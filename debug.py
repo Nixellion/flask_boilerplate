@@ -22,6 +22,7 @@ def setup_logging(
     """Setup logging configuration
 
     """
+
     path = default_path
     value = os.getenv(env_key, None)
     if value:
@@ -31,18 +32,43 @@ def setup_logging(
             config = yaml.safe_load(f.read())
 
         logpath = os.path.join(basedir, config['handlers']['debug_file_handler']['filename'])
-        print("Set log path to:", logpath)
+        print("Set log path to", logpath)
         config['handlers']['debug_file_handler']['filename'] = logpath
 
         logging.config.dictConfig(config)
     else:
         logging.basicConfig(level=default_level)
-    return logpath
 
 
-log = logger = logging.getLogger("default")
-logpath = setup_logging()
-log.debug(f"Set log path to: {logpath}")
+def catch_errors_json(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e), "traceback": traceback.format_exc()})
+
+    return wrapped
+
+
+loggers = {}
+
+
+def get_logger(name):
+    global loggers
+
+    if loggers.get(name):
+        # print (f"Logger {name} exists, reuse.")
+        return loggers.get(name)
+    else:
+        logger = logging.getLogger(name)
+        loggers[name] = logger
+        setup_logging()
+        return logger
+
+
+log = logger = get_logger("default")
 
 def catch_errors_json(f):
     @functools.wraps(f)

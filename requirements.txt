@@ -3,4 +3,3 @@ flask-socketio
 eventlet
 pyyaml
 peewee
-playhouse

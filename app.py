@@ -2,8 +2,14 @@
 Main application file
 '''
 
-import eventlet
-eventlet.monkey_patch()
+ASYNC_MODE = "gevent" # gevent, eventlet
+
+if ASYNC_MODE == 'eventlet':
+    import eventlet
+    eventlet.monkey_patch()
+elif ASYNC_MODE == "gevent":
+    from gevent import monkey
+    monkey.patch_all()
 
 from flask import Flask, Response, render_template, Markup, request, redirect
 from flask_socketio import SocketIO
@@ -26,7 +32,7 @@ config = read_config()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'BLAAAA_GeneerateMeDynamicallyForBetterSecurity'
 
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app, async_mode=ASYNC_MODE)
 
 
 app.jinja_env.filters['html_line_breaks'] = jinja_filters.html_line_breaks

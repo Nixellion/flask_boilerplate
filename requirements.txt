@@ -1,5 +1,6 @@
 flask
 flask-socketio
 eventlet
+gevent
 pyyaml
 peewee

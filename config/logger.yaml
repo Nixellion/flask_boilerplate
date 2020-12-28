@@ -17,15 +17,17 @@ handlers:
         formatter: simple
         filename: dashboard.log
         maxBytes: 5000000 # 5MB
-        backupCount: 0
+        backupCount: 1
         encoding: utf8
 
 
 root:
     level: ERROR
-    handlers: [debug_file_handler]
+    handlers: [debug_file_handler, console]
 
 loggers:
   "default":
     level: DEBUG
-    handlers: [debug_file_handler, console]
+#    handlers: [debug_file_handler]
+# Non root handlers are ADDED to root handlers. All extra loggers get whatever is in the root by default.
+# This is where all the duplicates were coming from.

@@ -11,6 +11,9 @@ from flask import Response, jsonify, render_template
 import functools
 
 basedir = os.path.dirname(os.path.realpath(__file__))
+logs_dir = os.path.join(basedir, "logs")
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
 
 
 def setup_logging(
@@ -31,9 +34,11 @@ def setup_logging(
         with open(path, 'rt') as f:
             config = yaml.safe_load(f.read())
 
-        logpath = os.path.join(basedir, config['handlers']['debug_file_handler']['filename'])
-        print("Set log path to", logpath)
-        config['handlers']['debug_file_handler']['filename'] = logpath
+        for handler, data in config['handlers'].items():
+            if 'filename' in data:
+                logpath = os.path.join(logs_dir, config['handlers'][handler]['filename'])
+                print("Set", handler, "log path to", logpath)
+                config['handlers'][handler]['filename'] = logpath
 
         logging.config.dictConfig(config)
     else:

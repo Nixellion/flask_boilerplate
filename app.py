@@ -1,9 +1,18 @@
 '''
 Main application file
+TODO https://github.com/Nixellion/flask_boilerplate/issues
 '''
 
-import eventlet
-eventlet.monkey_patch()
+ASYNC_MODE = "gevent"  # gevent, eventlet
+
+if ASYNC_MODE == 'eventlet':
+    import eventlet
+
+    eventlet.monkey_patch()
+elif ASYNC_MODE == "gevent":
+    from gevent import monkey
+
+    monkey.patch_all()
 
 from flask import Flask, Response, render_template, Markup, request, redirect
 from flask_socketio import SocketIO
@@ -26,8 +35,7 @@ config = read_config()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'BLAAAA_GeneerateMeDynamicallyForBetterSecurity'
 
-socketio = SocketIO(app, async_mode='eventlet')
-
+socketio = SocketIO(app, async_mode=ASYNC_MODE)
 
 app.jinja_env.filters['html_line_breaks'] = jinja_filters.html_line_breaks
 
@@ -55,12 +63,13 @@ def add_background_task(task, interval):
 
 
 if __name__ == '__main__':
-    
+
     # add_background_task(log_chat, 5)
     config = read_config()
 
     from views import app as views
     from api import app as api
+
     app.register_blueprint(views)
     app.register_blueprint(api)
 
@@ -73,6 +82,3 @@ if __name__ == '__main__':
         socketio.run(app, debug=False, host=config['host'], port=config['port'])
     except:
         print("Unable to start", exc_info=True)
-
-
-

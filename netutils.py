@@ -34,6 +34,9 @@ def wait_for_internet_connection():
 
 
 def test_intertnet_connection():
+    """
+    Tests internet connection by pinging a number of hosts. If none of the pings works then there's no internet.
+    """
     for ip in test_ips:
         if ping(ip):
             return True

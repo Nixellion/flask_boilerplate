@@ -1,5 +1,7 @@
 database_migrate: False
-host: 0.0.0.0
-port: 1234
-template: adminlte
+server:
+  host: 0.0.0.0  # Comment out for production use
+  port: 1234
+  debug: False
+template: bootstrap4
 project_name: Flask Boilerplate

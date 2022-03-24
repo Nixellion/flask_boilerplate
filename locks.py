@@ -8,11 +8,8 @@ import os
 from paths import APP_DIR
 
 # region Logger
-import logging
-from debug import setup_logging
-
-log = logger = logging.getLogger("ark_dashboard")
-setup_logging()
+from debug import get_logger
+log = get_logger("default")
 # endregion
 
 class Lock(object):

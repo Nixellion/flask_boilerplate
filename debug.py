@@ -1,8 +1,16 @@
-'''
-This file contains debugging stuff, like logger configuration, error wrap functions and the like.
-'''
+"""
+debug.py
+Usage:
+```
+from debug import get_logger
+log = get_logger("default")
+```
+"""
+
+__version__ = "2021.07.23"
 
 import os
+import sys
 import traceback
 import logging
 import logging.config
@@ -11,7 +19,12 @@ from flask import Response, jsonify, render_template
 import functools
 
 basedir = os.path.dirname(os.path.realpath(__file__))
-logs_dir = os.path.join(basedir, "logs")
+global loggers
+loggers = {}
+
+logging_set_up = False
+
+logs_dir = os.path.join(basedir, 'logs')
 if not os.path.exists(logs_dir):
     os.makedirs(logs_dir)
 
@@ -22,9 +35,12 @@ def setup_logging(
         env_key='LOG_CFG',
         logname=None
 ):
-    """Setup logging configuration
-
     """
+    Setup logging configuration
+    """
+    caller = sys._getframe(1).f_globals.get('__name__')
+    if caller != "debug":
+        print("DEBUG.PY - setup_logging - WARNING - Deprecated use of debug.py by {}".format(caller))
 
     path = default_path
     value = os.getenv(env_key, None)
@@ -37,7 +53,11 @@ def setup_logging(
         for handler, data in config['handlers'].items():
             if 'filename' in data:
                 logpath = os.path.join(logs_dir, config['handlers'][handler]['filename'])
-                print("Set", handler, "log path to", logpath)
+                print(
+                    "DEBUG.PY - setup_logging - Setting up logger '{}' requested by ({}), filepath is set to: {}; ".format(
+                        handler,
+                        caller,
+                        logpath))
                 config['handlers'][handler]['filename'] = logpath
 
         logging.config.dictConfig(config)
@@ -45,35 +65,36 @@ def setup_logging(
         logging.basicConfig(level=default_level)
 
 
-def catch_errors_json(f):
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except Exception as e:
-            traceback.print_exc()
-            return jsonify({"error": str(e), "traceback": traceback.format_exc()})
-
-    return wrapped
-
-
-loggers = {}
-
-
 def get_logger(name):
+    caller = sys._getframe(1).f_globals.get('__name__')
     global loggers
-
     if loggers.get(name):
-        # print (f"Logger {name} exists, reuse.")
+        print("DEBUG.PY - get_logger - ({}) requested logger '{}', using existing logger.".format(caller, name))
         return loggers.get(name)
     else:
+        print("DEBUG.PY - get_logger - ({}) requested logger '{}', setting up new logger. ({})".format(caller, name,
+                                                                                                       list(
+                                                                                                           loggers.keys())))
         logger = logging.getLogger(name)
         loggers[name] = logger
-        setup_logging()
         return logger
 
 
-log = logger = get_logger("default")
+log = get_logger("default")
+
+
+def catch_errors(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            traceback.print_exc()
+            log.error(f"Error in function {f.__name__}: {str(e)}", exc_info=True)
+            return None
+
+    return wrapped
+
 
 def catch_errors_json(f):
     @functools.wraps(f)
@@ -82,10 +103,10 @@ def catch_errors_json(f):
             return f(*args, **kwargs)
         except Exception as e:
             traceback.print_exc()
-            log.error(traceback.format_exc())
             return jsonify({"error": str(e), "traceback": traceback.format_exc()})
 
     return wrapped
+
 
 def catch_errors_html(f):
     @functools.wraps(f)
@@ -94,7 +115,10 @@ def catch_errors_html(f):
             return f(*args, **kwargs)
         except Exception as e:
             traceback.print_exc()
-            log.error(traceback.format_exc())
-            return render_template("error.html", error=str(e), error_trace=traceback.format_exc())
+            return render_template("error.html", error=str(e), details=traceback.format_exc())
 
     return wrapped
+
+
+if not logging_set_up:
+    setup_logging()

@@ -1,0 +1,11 @@
+[Unit]
+Description=FlaskBoilerPlate App
+User=root # Optional
+Group=root # Optional
+
+[Service]
+Type=simple #simple for flask. Forking for forking apps. idle for something idle :D
+ExecStart=/usr/bin/python3 /opt/flask_boilerplate/app.py
+
+[Install]
+WantedBy=multi-user.target

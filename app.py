@@ -15,16 +15,14 @@ elif ASYNC_MODE == "gevent":
     monkey.patch_all()
 
 from flask import Flask, Response, render_template, Markup, request, redirect
+# from flask.ext.assets import Environment, Bundle
 from flask_socketio import SocketIO
 
 from datetime import datetime
 
 # region Logger
-import logging
-from debug import setup_logging
-
-log = logger = logging.getLogger("default")
-setup_logging()
+from debug import get_logger
+log = get_logger("default")
 # endregion
 
 from configuration import read_config
@@ -74,11 +72,11 @@ if __name__ == '__main__':
     app.register_blueprint(api)
 
     try:
-        if config['host'] == "0.0.0.0":
+        if config['server'].get('host', '0.0.0.0') == "0.0.0.0":
             host = 'localhost'
         else:
-            host = config['host']
-        log.info(f"Running at http://{host}:{config['port']}")
-        socketio.run(app, debug=False, host=config['host'], port=config['port'])
+            host = config['server']['host']
+        log.info(f"Running at http://{host}:{config['server']['port']}")
+        socketio.run(app, **config['server'])
     except:
-        print("Unable to start", exc_info=True)
+        log.error("Unable to start", exc_info=True)

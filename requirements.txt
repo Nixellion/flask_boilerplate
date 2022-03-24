@@ -1,7 +1,9 @@
 flask
 flask-socketio
+flask-assets
 gevent
 gevent-websocket
 eventlet
 pyyaml
 peewee
+pyscss

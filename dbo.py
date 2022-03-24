@@ -1,14 +1,12 @@
 # region ############################# IMPORTS #############################
 
-import logging
-from debug import setup_logging
-log = logging.getLogger("default")
-setup_logging()
+from debug import get_logger
+log = get_logger("default")
 
 import os
 from datetime import datetime
 from peewee import *
-from playhouse.sqlite_ext import SqliteExtDatabase#, FTS5Model, SearchField
+from playhouse.sqlite_ext import SqliteExtDatabase  # , FTS5Model, SearchField
 from configuration import read_config, write_config
 from paths import DATA_DIR
 
@@ -25,15 +23,15 @@ pragmas = [
     ('cache_size', -1000 * 32)]
 db = SqliteExtDatabase(db_path, pragmas=pragmas)
 
-# endregion
 
+# endregion
 
 
 # region ############################# TABLE CLASSES #############################
 
 class BroModel(Model):
-    date_created = DateTimeField(default=datetime.now())
-    date_updated = DateTimeField(default=datetime.now())
+    date_created = DateTimeField()
+    date_updated = DateTimeField()
     date_deleted = DateTimeField(null=True)
     deleted = BooleanField(default=False)
 
@@ -42,10 +40,17 @@ class BroModel(Model):
         self.date_deleted = datetime.now()
         self.save()
 
+    def save(self, *args, **kwargs):
+        if self.date_created is None:
+            self.date_created = datetime.now()
+        if self.date_updated is None:
+            self.date_updated = datetime.now()
+
+        super(BroModel, self).save(*args, **kwargs)
+
+
 class Entry(BroModel):
     filename = TextField()
-
-
 
     class Meta:
         database = db
@@ -61,7 +66,6 @@ class Entry(BroModel):
         ret = super(Entry, self).save(*args, **kwargs)
 
         return ret
-
 
 
 # region Migration

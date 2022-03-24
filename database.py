@@ -46,7 +46,7 @@ class BroModel(Model):
     def save(self, *args, **kwargs):
         if self.date_created is None:
             self.date_created = datetime.now()
-            
+
         self.date_updated = datetime.now()
 
         super(BroModel, self).save(*args, **kwargs)

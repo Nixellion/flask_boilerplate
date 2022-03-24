@@ -51,7 +51,7 @@ def test_intertnet_connection():
     return False
 
 
-def get_real_ip(request, default=None):
+def get_real_ip(request, default=None, split=True, single=True):
     try:
         if request.headers.getlist("X-Forwarded-For"):
             ip = request.headers.getlist("X-Forwarded-For")[0]
@@ -62,7 +62,22 @@ def get_real_ip(request, default=None):
         return ip
     except Exception as e:
         log.debug(f"Can't determine IP: {e}")
-        return default
+        ip = default
+
+    if ip is None:
+        return ip
+
+    if split:
+        ip = ip.split(",")
+        ip = [ip.strip() for ip in ip]
+
+        if single:
+            ip = ip[0]
+    else:
+        if single:
+            ip = ip.split(",")[0]
+
+    return ip
 
 
 class ProxiedRequest(Request):

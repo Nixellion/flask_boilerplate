@@ -2,6 +2,9 @@ from platform import system as system_name  # Returns the system/OS name
 from os import system as system_call  # Execute a shell command
 import time
 
+from debug import get_logger
+log = get_logger("default")
+
 from flask import Request
 
 test_ips = ['duckduckgo.com',
@@ -48,7 +51,7 @@ def test_intertnet_connection():
     return False
 
 
-def get_real_ip(request):
+def get_real_ip(request, default=None):
     try:
         if request.headers.getlist("X-Forwarded-For"):
             ip = request.headers.getlist("X-Forwarded-For")[0]
@@ -57,8 +60,9 @@ def get_real_ip(request):
         else:
             ip = request.remote_addr
         return ip
-    except:
-        return "0.0.0.0"
+    except Exception as e:
+        log.debug(f"Can't determine IP: {e}")
+        return default
 
 
 class ProxiedRequest(Request):

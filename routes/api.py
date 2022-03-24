@@ -11,6 +11,20 @@ from dbo import Entry
 
 app = Blueprint("api", __name__)
 
+
+def api_response(data=None, success: bool = True, message: str = None):
+    """
+    Wrapper для API ответов, который помогает легко форматировать данные в едином виде.
+    По умолчанию возвращает success
+    """
+    r = {"success": success}
+    if data:
+        r['data'] = data
+    if message:
+        r['message'] = message
+    return jsonify(r)
+
+
 @app.route("/api")
 @catch_errors_json
 def api_index():

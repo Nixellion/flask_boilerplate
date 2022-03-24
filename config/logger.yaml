@@ -30,9 +30,10 @@ handlers:
         encoding: utf8
 
 #    slack_log_handler:
-#        class: debug_loggers.BroSlackLogHandler
+#        class: loggers.slack_logger.SlackLogHandler
 #        level: ERROR
-#        webhook_url: https://hooks.slack.com/services/x/x/x
+#        webhook_url: https://mattermost.domain.com/hooks/xxxxxxxx
+#        fallback_webhook_url: https://hooks.slack.com/services/x/x/x
 
 root:
     level: INFO

@@ -2,6 +2,8 @@ from platform import system as system_name  # Returns the system/OS name
 from os import system as system_call  # Execute a shell command
 import time
 
+from flask import Request
+
 test_ips = ['duckduckgo.com',
             'cloudflare.com',
             'google.com',
@@ -45,3 +47,28 @@ def test_intertnet_connection():
             time.sleep(try_delay)
     return False
 
+
+def get_real_ip(request):
+    try:
+        if request.headers.getlist("X-Forwarded-For"):
+            ip = request.headers.getlist("X-Forwarded-For")[0]
+        elif request.headers.getlist("X-Real-Ip"):
+            ip = request.headers.getlist("X-Real-Ip")[0]
+        else:
+            ip = request.remote_addr
+        return ip
+    except:
+        return "0.0.0.0"
+
+
+class ProxiedRequest(Request):
+    def __init__(self, environ, populate_request=True, shallow=False):
+        super(Request, self).__init__(environ, populate_request, shallow)
+        # Support SSL termination. Mutate the host_url within Flask to use https://
+        # if the SSL was terminated.
+        x_forwarded_proto = self.headers.get('X-Forwarded-Proto')
+        if x_forwarded_proto == 'https':
+            self.url = self.url.replace('http://', 'https://')
+            self.host_url = self.host_url.replace('http://', 'https://')
+            self.base_url = self.base_url.replace('http://', 'https://')
+            self.url_root = self.url_root.replace('http://', 'https://')

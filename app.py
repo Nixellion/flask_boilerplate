@@ -14,7 +14,7 @@ elif ASYNC_MODE == "gevent":
 
     monkey.patch_all()
 
-from flask import Flask, Response, render_template, Markup, request, redirect
+from flask import Flask
 # from flask.ext.assets import Environment, Bundle
 from flask_socketio import SocketIO
 
@@ -22,28 +22,35 @@ from datetime import datetime
 
 # region Logger
 from debug import get_logger
+
 log = get_logger("default")
 # endregion
 
 from configuration import read_config
-import jinja_filters
+from utilities.jinja_utils import common_filters, common_globals
 
 config = read_config()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'BLAAAA_GeneerateMeDynamicallyForBetterSecurity'
+app.config['SECRET_KEY'] = 'Please-Change-This-For-Better-Security-19#91-Or-Generate-Dynamically'
 
 socketio = SocketIO(app, async_mode=ASYNC_MODE)
 
-app.jinja_env.filters['html_line_breaks'] = jinja_filters.html_line_breaks
+for filter_function in common_filters.enabled_filters:
+    app.jinja_env.filters[filter_function.__name__] = filter_function
 
 
 @app.context_processor
 def inject_global_variables():
-    return dict(
+    global_vars = dict(
         config=config,
         now=datetime.now()
     )
+
+    for func in common_globals.enabled_functions:
+        global_vars[func.__name__] = func
+
+    return global_vars
 
 
 def add_background_task(task, interval):
@@ -65,8 +72,8 @@ if __name__ == '__main__':
     # add_background_task(log_chat, 5)
     config = read_config()
 
-    from views import app as views
-    from api import app as api
+    from routes.views import app as views
+    from routes.api import app as api
 
     app.register_blueprint(views)
     app.register_blueprint(api)

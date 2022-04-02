@@ -3,11 +3,17 @@ API paths, manually generated
 Could use flask-restful, I personally did not find much benefit in using it, yet.
 '''
 
+import os
+import time
 
-from flask import Blueprint, jsonify, request
+
+from flask import Blueprint, jsonify, request, Response
 from debug import catch_errors_json
+from pygtail import Pygtail
 
-from dbo import Entry
+from database import Entry
+
+from paths import LOGS_DIR
 
 app = Blueprint("api", __name__)
 
@@ -38,6 +44,14 @@ def api_new_entry():
         new_entry.filename = request.form['filename']
         new_entry.save()
         return jsonify({"success": True})
+
+@app.route('/api/log_stream')
+def log_stream():
+    def generate():
+        for line in Pygtail(os.path.join(LOGS_DIR, "debug.log"), every_n=1):
+            yield "data:" + str(line) + "\n\n"
+            time.sleep(0.3)
+    return Response(generate(), mimetype='text/event-stream')
 
 # @app.route("/update")
 # @catch_errors_json

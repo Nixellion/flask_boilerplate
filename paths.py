@@ -9,3 +9,5 @@ import os
 APP_DIR = os.path.dirname(os.path.realpath(__file__))
 CONFIG_DIR = os.path.join(APP_DIR, "config")
 DATA_DIR = os.path.join(APP_DIR, "data")
+LOGS_DIR = os.path.join(APP_DIR, "logs")
+DATABASE_PATH = os.path.join(DATA_DIR, "database.db")

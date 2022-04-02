@@ -8,7 +8,7 @@ from datetime import datetime
 from peewee import *
 from playhouse.sqlite_ext import SqliteExtDatabase  # , FTS5Model, SearchField
 from configuration import read_config, write_config
-from paths import DATA_DIR
+from paths import DATABASE_PATH
 
 # endregion
 
@@ -17,11 +17,10 @@ from paths import DATA_DIR
 realpath = os.path.dirname(os.path.realpath(__file__))
 rp = realpath
 
-db_path = os.path.join(DATA_DIR, 'database.db')
 pragmas = [
     ('journal_mode', 'wal'),
     ('cache_size', -1000 * 32)]
-db = SqliteExtDatabase(db_path, pragmas=pragmas)
+db = SqliteExtDatabase(DATABASE_PATH, pragmas=pragmas)
 
 
 # endregion
@@ -56,7 +55,7 @@ class Entry(BroModel):
     filename = TextField()
 
 
-log.info(" ".join(["Using DB", str(db), "At path:", str(db_path)]))
+log.info(" ".join(["Using DB", str(db), "At path:", str(DATABASE_PATH)]))
 
 # On init make sure we create database
 

@@ -3,12 +3,14 @@ disable_existing_loggers: False
 formatters:
     simple:
         format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    colored:
+      '()': debug.ColoredFormatter
 
 handlers:
     console:
         class: logging.StreamHandler
         level: DEBUG
-        formatter: simple
+        formatter: colored
         stream: ext://sys.stdout
 
     debug_file_handler:
@@ -29,6 +31,8 @@ handlers:
         backupCount: 2
         encoding: utf8
 
+    
+
 #    slack_log_handler:
 #        class: loggers.slack_logger.SlackLogHandler
 #        level: ERROR
@@ -36,13 +40,12 @@ handlers:
 #        fallback_webhook_url: https://hooks.slack.com/services/x/x/x
 
 root:
-    level: INFO
+    level: DEBUG
     handlers: [ debug_file_handler, console ]
 
+# Names should be taken from filenames
 loggers:
-    "default":
-        level: DEBUG
-    "database":
+    "app.py":
         level: DEBUG
 # Non root handlers are ADDED to root handlers. All extra loggers get whatever is in the root by default.
 # This is where all the duplicates were coming from.

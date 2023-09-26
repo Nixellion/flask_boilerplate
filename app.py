@@ -18,6 +18,8 @@ from flask import Flask
 # from flask.ext.assets import Environment, Bundle
 from flask_socketio import SocketIO
 
+from functools import partial
+
 from datetime import datetime
 
 # region Logger
@@ -57,9 +59,14 @@ def add_background_task(task, interval):
     def tsk():
         while True:
             try:
-                log.debug(f"Running background task {task.__name__}...")
-                task()
-                log.debug(f"Completed background task {task.__name__}!")
+                if isinstance(task, partial):
+                    log.debug(f"Running background task {task.func.__name__}...")
+                    task()
+                    log.debug(f"Completed background task {task.func.__name__}!")
+                else:
+                    log.debug(f"Running background task {task.__name__}...")
+                    task()
+                    log.debug(f"Completed background task {task.__name__}!")
             except Exception as e:
                 log.error(f"Can't run background task '{task.__name__}': {e}", exc_info=True)
             socketio.sleep(interval)

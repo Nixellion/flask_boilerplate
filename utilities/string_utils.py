@@ -4,7 +4,7 @@ from random import getrandbits
 
 from flask import render_template
 
-from bro_utils import config
+from configuration import config
 
 
 def render_template_themed(name, **kwargs):

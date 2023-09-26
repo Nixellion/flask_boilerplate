@@ -9,6 +9,7 @@ from peewee import *
 from playhouse.sqlite_ext import SqliteExtDatabase  # , FTS5Model, SearchField
 from configuration import read_config, write_config
 from paths import DATABASE_PATH
+import uuid
 
 # endregion
 
@@ -29,7 +30,10 @@ db = SqliteExtDatabase(DATABASE_PATH, pragmas=pragmas)
 # region ############################# TABLE CLASSES #############################
 
 class BroModel(Model):
-    date_created = DateTimeField()
+    # Uncomment to use UUIDs globally. Peewee can take FUNCTIONS\callables as default values.
+    # Make sure NOT TO INCLUDE brackets
+    # id = UUIDField(primary_key=True, default=uuid.uuid4)
+    date_created = DateTimeField(default=datetime.now)
     date_updated = DateTimeField()
     date_deleted = DateTimeField(null=True)
     deleted = BooleanField(default=False)
@@ -43,9 +47,6 @@ class BroModel(Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        if self.date_created is None:
-            self.date_created = datetime.now()
-
         self.date_updated = datetime.now()
 
         super(BroModel, self).save(*args, **kwargs)

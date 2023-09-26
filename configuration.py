@@ -11,3 +11,6 @@ def read_config(name="config"):
 def write_config(data, name="config"):
     with open(os.path.join(CONFIG_DIR, name+".yaml"), "w+") as f:
         f.write(yaml.dump(data, default_flow_style=False))
+
+# Main and default config
+config = read_config()

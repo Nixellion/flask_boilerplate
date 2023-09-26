@@ -3,11 +3,18 @@ debug.py
 Usage:
 ```
 from debug import get_logger
+log = get_logger(os.path.basename(os.path.realpath(__file__)))
+OR
 log = get_logger("default")
 ```
+
+Changelog:
+
+# 2022.04.03
+    - Added colored formatter for console
 """
 
-__version__ = "2021.07.23"
+__version__ = "2022.04.03"
 
 import os
 import sys
@@ -17,6 +24,11 @@ import logging.config
 import yaml
 from flask import Response, jsonify, render_template
 import functools
+
+from colorama import just_fix_windows_console, Fore, Back, Style
+just_fix_windows_console()
+
+import logging
 
 basedir = os.path.dirname(os.path.realpath(__file__))
 global loggers
@@ -28,9 +40,24 @@ logs_dir = os.path.join(basedir, 'logs')
 if not os.path.exists(logs_dir):
     os.makedirs(logs_dir)
 
+class ColoredFormatter(logging.Formatter):
+    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+
+    FORMATS = {
+        logging.DEBUG: Style.DIM + format + Style.RESET_ALL,
+        logging.INFO: Fore.CYAN + format + Style.RESET_ALL,
+        logging.WARNING: Fore.YELLOW + format + Style.RESET_ALL,
+        logging.ERROR: Fore.RED + format + Style.RESET_ALL,
+        logging.CRITICAL: Back.RED + Fore.WHITE + format + Style.RESET_ALL
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
 
 def setup_logging(
-        default_path=os.path.join(basedir, 'config', 'logger.yaml'),
+        default_path=os.path.join(basedir, 'logger.yaml'),
         default_level=logging.INFO,
         env_key='LOG_CFG',
         logname=None
@@ -70,12 +97,15 @@ def get_logger(name):
     global loggers
     if loggers.get(name):
         print("DEBUG.PY - get_logger - ({}) requested logger '{}', using existing logger.".format(caller, name))
-        return loggers.get(name)
+        logger = loggers.get(name)
+        # coloredlogs.install(level='DEBUG', logger=logger, fmt='# %(name)s - %(levelname)-8s - %(message)s')
+        return logger
     else:
         print("DEBUG.PY - get_logger - ({}) requested logger '{}', setting up new logger. ({})".format(caller, name,
                                                                                                        list(
                                                                                                            loggers.keys())))
         logger = logging.getLogger(name)
+        # coloredlogs.install(level='DEBUG', logger=logger, fmt='# %(name)s - %(levelname)-8s - %(message)s')
         loggers[name] = logger
         return logger
 

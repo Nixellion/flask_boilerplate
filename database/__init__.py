@@ -1,7 +1,8 @@
 # region ############################# IMPORTS #############################
 
-from debug import get_logger
-log = get_logger("default")
+# region Logger
+from loguru import logger as log
+# endregion
 
 import os
 from datetime import datetime

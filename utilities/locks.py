@@ -8,8 +8,7 @@ import os
 from paths import APP_DIR
 
 # region Logger
-from debug import get_logger
-log = get_logger("default")
+from loguru import logger as log
 # endregion
 
 class Lock(object):

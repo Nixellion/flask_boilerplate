@@ -2,8 +2,9 @@ from platform import system as system_name  # Returns the system/OS name
 from os import system as system_call  # Execute a shell command
 import time
 
-from debug import get_logger
-log = get_logger("default")
+# region Logger
+from loguru import logger as log
+# endregion
 
 from flask import Request
 

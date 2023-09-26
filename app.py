@@ -23,9 +23,7 @@ from functools import partial
 from datetime import datetime
 
 # region Logger
-from debug import get_logger
-
-log = get_logger("default")
+from loguru import logger as log
 # endregion
 
 from configuration import read_config

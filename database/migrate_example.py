@@ -9,9 +9,9 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-# Import logger to log things that happen here
-from debug import get_logger
-log = get_logger("database")
+# region Logger
+from loguru import logger as log
+# endregion
 
 # Import paths module to get a path to database and data dirs
 from paths import DATABASE_PATH

@@ -52,6 +52,9 @@ class BroModel(Model):
 
         super(BroModel, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return f"{type(self)}: {self.id}"
+
 
 class Entry(BroModel):
     filename = TextField()
